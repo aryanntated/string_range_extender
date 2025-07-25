@@ -1,8 +1,7 @@
 import re
 
 def expand_ranges(input_string, delimiters=["-"]):
-    
-    result = []
+    result = set()
     parts = input_string.split(',')
 
     delimiter_pattern = "|".join(map(re.escape, delimiters))
@@ -31,23 +30,23 @@ def expand_ranges(input_string, delimiters=["-"]):
             except ValueError:
                 raise ValueError(f"Invalid range component: {part}")
 
-            # Infer step if not provided
             if step is None:
                 step = 1 if start <= end else -1
             else:
                 if start > end and step > 0:
-                    step = -step  # fix direction for descending range
+                    step = -step
                 elif start < end and step < 0:
-                    step = -step  # fix direction for ascending range
+                    step = -step
 
-            result.extend(range(start, end + (1 if step > 0 else -1), step))
+            # Add to set to deduplicate
+            result.update(range(start, end + (1 if step > 0 else -1), step))
 
         elif len(range_match) == 1:
             try:
-                result.append(int(range_match[0]))
+                result.add(int(range_match[0]))
             except ValueError:
                 raise ValueError(f"Invalid number: {part}")
         else:
             raise ValueError(f"Malformed input: {part}")
 
-    return result
+    return sorted(result)
