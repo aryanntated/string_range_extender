@@ -18,13 +18,17 @@ def expand_ranges(input_string, delimiters=["-"]):
             try:
                 start = int(range_match[0])
                 end = int(range_match[1])
-                result.extend(range(start, end + 1))
             except ValueError:
                 raise ValueError(f"Invalid range component: {part}")
-        else:
+
+            step = 1 if start <= end else -1
+            result.extend(range(start, end + step, step))
+        elif len(range_match) == 1:
             try:
-                result.append(int(part))
+                result.append(int(range_match[0]))
             except ValueError:
                 raise ValueError(f"Invalid number: {part}")
+        else:
+            raise ValueError(f"Malformed input: {part}")
 
     return result
