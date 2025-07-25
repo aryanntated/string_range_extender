@@ -1,22 +1,30 @@
-def expand_ranges(input_string):
-    """
-    Expands a string like "1-3,5" into a list of integers [1, 2, 3, 5].
-    Now also handles whitespace and empty parts.
-    """
+import re
+
+def expand_ranges(input_string, delimiters=["-"]):
+    
     result = []
     parts = input_string.split(',')
 
+    delimiter_pattern = "|".join(map(re.escape, delimiters))
+
     for part in parts:
         part = part.strip()
-        if not part:  # skip empty entries
+        if not part:
             continue
 
-        if '-' in part:
-            start, end = part.split('-')
-            start = int(start)
-            end = int(end)
-            result.extend(range(start, end + 1))
+        range_match = re.split(f"\s*(?:{delimiter_pattern})\s*", part)
+
+        if len(range_match) == 2:
+            try:
+                start = int(range_match[0])
+                end = int(range_match[1])
+                result.extend(range(start, end + 1))
+            except ValueError:
+                raise ValueError(f"Invalid range component: {part}")
         else:
-            result.append(int(part))
-    
+            try:
+                result.append(int(part))
+            except ValueError:
+                raise ValueError(f"Invalid number: {part}")
+
     return result
