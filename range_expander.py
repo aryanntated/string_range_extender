@@ -1,12 +1,16 @@
 def expand_ranges(input_string):
     """
     Expands a string like "1-3,5" into a list of integers [1, 2, 3, 5].
+    Now also handles whitespace and empty parts.
     """
     result = []
     parts = input_string.split(',')
 
     for part in parts:
         part = part.strip()
+        if not part:  # skip empty entries
+            continue
+
         if '-' in part:
             start, end = part.split('-')
             start = int(start)
