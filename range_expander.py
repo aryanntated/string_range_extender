@@ -1,6 +1,6 @@
 import re
 
-def expand_ranges(input_string, delimiters=["-"]):
+def expand_ranges(input_string, delimiters=["-"], output_format="list"):
     result = set()
     parts = input_string.split(',')
 
@@ -19,7 +19,7 @@ def expand_ranges(input_string, delimiters=["-"]):
                 raise ValueError(f"Invalid step value in: {part}")
         else:
             range_part = part
-            step = None  # will be inferred
+            step = None
 
         range_match = re.split(f"\s*(?:{delimiter_pattern})\s*", range_part)
 
@@ -38,7 +38,6 @@ def expand_ranges(input_string, delimiters=["-"]):
                 elif start < end and step < 0:
                     step = -step
 
-            # Add to set to deduplicate
             result.update(range(start, end + (1 if step > 0 else -1), step))
 
         elif len(range_match) == 1:
@@ -49,4 +48,13 @@ def expand_ranges(input_string, delimiters=["-"]):
         else:
             raise ValueError(f"Malformed input: {part}")
 
-    return sorted(result)
+    sorted_result = sorted(result)
+
+    if output_format == "list":
+        return sorted_result
+    elif output_format == "csv":
+        return ",".join(map(str, sorted_result))
+    elif output_format == "set":
+        return set(sorted_result)
+    else:
+        raise ValueError(f"Unsupported output_format: {output_format}")
